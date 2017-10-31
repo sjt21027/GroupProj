@@ -29,4 +29,4 @@ false.o: false.cpp
 clean:
 	rm -f *.o
 	rm -f *~
-	rm -f head true false
+	rm -f head true false env
