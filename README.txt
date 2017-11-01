@@ -1,5 +1,6 @@
 CSCI 1730 Project 2 Fall 2017
-Steven Thompson
+Steven Thompson      811168792
+       -implemented tail.cpp wc.cpp and javadocs
 
 Donald Dunagan	811648053
        -implemented env.cpp,false.cpp,head.cpp,true.cpp
