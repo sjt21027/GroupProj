@@ -55,38 +55,12 @@ void printFromSTDIN(int n){
       return;
   }
 }
-//print n number of lines from a file
-//@param n num lines to be read
-//@param fileName file to be read from
-
-void printFromFileC(int n, char* fileName){
-  char buf[1];
-  int z;
-  int fileDescriptor;
-  if((fileDescriptor = open(fileName, O_RDONLY)) < 2)
-    perror("open error in printFromFile");
-
-  //read 1 char at a time from the file
-  off_t pos = lseek(fileDescriptor, 0, SEEK_END);
-  if(pos == -1) {
-    perror("seek");
-  }
-  pos = lseek(fileDescriptor, (n-pos), SEEK_END);
-  if(pos == -1){
-    perror("seek2");
-  }
-  while ((z = read(fileDescriptor, buf, 1)) > 0){
-    if(write(STDOUT_FILENO, buf, z) !=z)
-      perror("write error in printFromFile");
-    if (z<0)
-      perror("read error in printFromFile");
-  }
-}
 
 void printFromFileN(int n, char* fileName){
   int linesRead = 0;
   char buf[1];
   int z;
+  int count = 0;
   int fileDescriptor;
   if((fileDescriptor = open(fileName, O_RDONLY)) < 2)
     perror("open error in printFromFile");
@@ -94,14 +68,23 @@ void printFromFileN(int n, char* fileName){
   while ((z = read(fileDescriptor, buf, 1)) > 0){
     if (buf[0] == '\n')
       linesRead++;
-    if(linesRead == n){
-      while((z = read(fileDescriptor, buf, 1)) > 0){
-        if(write(STDOUT_FILENO,buf,z) !=z)
-          perror("write error in printFromFileN");
+  }
+  if((n > linesRead) | (n < 0))
+    perror("N is greater that the lines read, or less than zero");
+
+  z = lseek(fileDescriptor, 0, SEEK_SET);
+  while ((z = read(fileDescriptor, buf, 1)) > 0){
+    if (buf[0] == '\n')
+      count++;
+
+    if(count == (linesRead-n)){
+     z = lseek(fileDescriptor, -1, SEEK_CUR);
+     while((z = read(fileDescriptor, buf, 1)) > 0){
+        if(write(STDIN_FILENO,buf,z) !=z)
+          perror("write error in printFileFromN");
       }
     }
   }
-
 }
 
 int main(int argc, char* argv[]) {
@@ -110,9 +93,10 @@ int main(int argc, char* argv[]) {
   int n = 10;
   bool numLineParam = false;
 
-  //check for -n parameter
+
+  //check for -n parameter                                                                                 
   for (int i = 0; i < argc; i++){
-    if (! strcmp(argv[i], "-n") | ! strcmp(argv[i], "-c")){
+    if (! strcmp(argv[i], "-n")){
       numLineParam = true;
       n = atoi (argv[i + 1]);
       cout << "N value: " << n << endl;
@@ -123,41 +107,30 @@ int main(int argc, char* argv[]) {
     }
   }
 
-  //if numLineParam,
+ //if numLineParam,                                                                                       
   if (numLineParam == true){
-    if (argc < 4){
+    if (argc < 4)
       printFromSTDIN(n);
-    }else{
-      for(int i = 2; i < argc; i++){
-        if(! strcmp(argv[i], "-c")){
-          cout << "Enter -c: " << endl;
-          printFromFileC(n,argv[i]);
-        }else if(! strcmp(argv[i], "-n")){
-          cout << "Enter -n: " << endl;
-          printFromFileC(n,argv[i]);
-           }else if(! strcmp(argv[i], "-n")){
-          cout << "Enter -n: " << endl;
-          printFromFileC(n,argv[i]);
-        }else{
-          cout << "Enter STDIN: " << endl;
-            printFromSTDIN(n);
-        }
+    else{
+      for(int i = 3; i < argc; i++){
+        if(! strcmp(argv[i], "-"))
+          printFromSTDIN(n);
+        else
+          printFromFileN(n,argv[i]);
       }
     }
   }
 
-  //if no  numLineParam
+  //if no  numLineParam                                                                                    
   else{
     if (argc < 2 )
       printFromSTDIN(n);
     else{
       for (int i = 1; i < argc; i++){
-        if (! strcmp(argv[i], "-c"))
-          printFromFileC(n, argv[i+1]);
-        else if(! strcmp(argv[i], "-n"))
-          printFromFileN(n,argv[i+1]);
-        else
+        if (! strcmp(argv[i], "-"))
           printFromSTDIN(n);
+        else
+          printFromFileN(n,argv[i]);
       }
     }
   }
