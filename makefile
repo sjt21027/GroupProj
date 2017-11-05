@@ -4,9 +4,13 @@ CFLAGS = -Wall -std=c++14 -O0 -pedantic-errors -c $(DEBUG)
 LFLAGS = -Wall $(DEBUG)
 
 
-all: head true false env wc
+all: head true false env wc tail
 
 
+tail: tail.o
+	$(CC) $(LFLAGS) -o tail tail.o
+tail.o: tail.cpp
+	$(CC) $(CFLAGS) tail.cpp
 wc: wc.o
 	$(CC) $(LFLAGS) -o wc wc.o
 wc.o: wc.cpp
@@ -33,4 +37,4 @@ false.o: false.cpp
 clean:
 	rm -f *.o
 	rm -f *~
-	rm -f head true false env wc
+	rm -f head true false env wc tail
