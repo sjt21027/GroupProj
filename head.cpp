@@ -1,3 +1,18 @@
+/*
+ * head.cpp 
+ *	
+ * This program replicates the head unix head utility
+ * which copies its input to std output for a certain
+ * length. The optional parameter [-n] indicates
+ * the number of liens to be printed while
+ * [file...] indicates one or more files to
+ * be printed.
+ * 
+ * Owner: Steven Thompson - Gray Dunagan
+ * 
+ * Version: 11.6.17
+ */
+
 #include <iostream>
 #include <fcntl.h>
 #include <unistd.h>
@@ -6,17 +21,11 @@
 using namespace std;
 
 /*
-This program replicates the head unix head utility
-which copies its input to std output for a certain
-length. The optional parameter [-n] indicates
-the number of liens to be printed while
-[file...] indicates one or more files to
-be printed.
-*/
-
-
-//print n number of lines from STDIN
-//@param n num lines to be read
+ * This function prints from the standard input and print the "n" lines from
+ * the start of the file
+ *
+ * @param n the integer amount of lines that will be printed from the top
+ */
 void printFromSTDIN(int n){
   int linesRead = 0;
   char buf[1];
@@ -42,9 +51,13 @@ void printFromSTDIN(int n){
    }
 }
 
-//print n number of lines from a file
-//@param n num lines to be read
-//@param fileName file to be read from
+/*
+ * This function prints from the "fileName" file and print the "n" lines from
+ * the start of the file
+ *
+ * @param n the integer amount of lines that will be printed from the top
+ * @param fileName the file in which to use for this function.
+ */
 void printFromFile(int n, char* fileName){
   int linesRead = 0;
   char buf[1];
@@ -69,7 +82,12 @@ void printFromFile(int n, char* fileName){
 
 }
 
-
+/*
+ * Main functin -- 
+ *
+ * @param argc the amount of arguments from the command line
+ * @param argv[] the file in which to interpret as a argument
+ */
 int main(int argc, char* argv[]) {
 
   //default numLines is 10
