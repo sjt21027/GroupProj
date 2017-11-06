@@ -113,10 +113,13 @@ int main(int argc, char* argv[]) {
 	   charCounter++;
 //          cout << "Character number: " << charCounter << " ---> " <<  buf[0] <<  endl;
 	 }
-	 if(charCounter > 1 && isspace(buf[0])){
+	 if(charCounter > 0 && z <= 0)
+	   words++;
+	 if(charCounter > 0 && (isspace(buf[0])     ) ){
 	   words++;
 	   charCounter = 0;
 	 }
+       
        }
 
        cout << words << " " << argv[i] << endl;
