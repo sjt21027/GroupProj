@@ -13,6 +13,7 @@
  * 
  * Version: 11.6.17
  */
+
 #include <iostream>
 #include <fcntl.h>
 #include <unistd.h>
@@ -54,19 +55,15 @@ int main(int argc, char* argv[]) {
   bool wCMD = false;
   
    for (int i = 0; i < argc; i++){
-
     if (! strcmp(argv[i], "-c"))
       cCMD = true;
-
     if (! strcmp(argv[i], "-l"))
       lCMD = true;
-
     if (! strcmp(argv[i], "-w"))
       wCMD = true;
-  }
+   }
 
    if(cCMD == true){
-
      for(int i = 2; i < argc; i++){
        if((fileDescriptor = open(argv[i],O_RDONLY))< 2)
 	 perror("open error");
@@ -88,15 +85,14 @@ int main(int argc, char* argv[]) {
   z = lseek(fileDescriptor, 0, SEEK_SET);
 
   if(lCMD == true){
-
     for(int i = 2; i < argc; i++){
-      
       if((fileDescriptor = open(argv[i], O_RDONLY)) < 2)
 	perror("open error");
 
       while((z = read(fileDescriptor, buf, 1)) > 0){
 	if(z==-1)
 	  perror("read error");
+	      
 	if(buf[0] == '\n')
 	  nl++;
       }
@@ -110,9 +106,7 @@ int main(int argc, char* argv[]) {
   z = lseek(fileDescriptor, 0, SEEK_SET);
 
    if(wCMD == true){
-
-     for(int i = 2; i < argc; i++){
-       
+     for(int i = 2; i < argc; i++){  
        if((fileDescriptor = open(argv[i], O_RDONLY)) < 2)
 	 perror("open error");
        
@@ -120,14 +114,11 @@ int main(int argc, char* argv[]) {
        while((z = read(fileDescriptor, buf, 1)) > 0){
 	 if(!isspace(buf[0])){
 	   charCounter++;
-//          cout << "Character number: " << charCounter << " ---> " <<  buf[0] <<  endl;
 	 }
-	
 	 if(charCounter > 0 && (isspace(buf[0])     ) ){
 	   words++;
 	   charCounter = 0;
 	 }
-       
        }
        
        cout << words << " " << argv[i] << endl;
