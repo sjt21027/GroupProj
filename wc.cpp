@@ -64,7 +64,31 @@ int main(int argc, char* argv[]) {
    }
 
    if(cCMD == true){
+
+    if(argc < 3){
+       while (( z = read(STDIN_FILENO, buf,1)) > 0){
+	 if(z==-1)
+	   perror("read error");
+	 count++;
+       }
+       cout << count << " "  << endl;
+     }
+
+     else{
+
      for(int i = 2; i < argc; i++){
+
+       if((! strcmp(argv[i], "-"))){
+	 while ((z = read(STDIN_FILENO, buf, 1)) > 0){
+	     if(z==-1)
+	       perror("read error");
+	     count++;
+	   }
+	   cout << count << " " << "-" << endl;
+	   masterCount += count;
+       }
+
+       else{
        if((fileDescriptor = open(argv[i],O_RDONLY))< 2)
 	 perror("open error");
 
@@ -77,6 +101,8 @@ int main(int argc, char* argv[]) {
        masterCount += count;
        count = 0;
      }
+     }
+     }
      if(argc > 3)
        cout << masterCount << " total" << endl;
    }
@@ -85,7 +111,34 @@ int main(int argc, char* argv[]) {
   z = lseek(fileDescriptor, 0, SEEK_SET);
 
   if(lCMD == true){
+
+    if(argc < 3){
+      while (( z = read(STDIN_FILENO, buf, 1)) > 0){
+	if(z==-1)
+	   perror("read error");
+	if(buf[0] == '\n')
+	  nl++;
+      }
+      cout << nl << " " << "-" << endl;
+    }
+
+    else{
     for(int i = 2; i < argc; i++){
+
+      if((! strcmp(argv[i], "-"))){
+	while ((z = read(STDIN_FILENO, buf, 1)) > 0){
+	  if (z==-1)
+	    perror("read error");
+	  if(buf[0] == '\n')
+	    nl++;
+	}
+	cout << nl << " "  << endl;
+	masterNL += nl;
+      }
+      
+      else{
+    for(int i = 2; i < argc; i++){
+
       if((fileDescriptor = open(argv[i], O_RDONLY)) < 2)
 	perror("open error");
 
@@ -100,34 +153,116 @@ int main(int argc, char* argv[]) {
       masterNL += nl;
       nl = 0;
     }
+    }
+    }
+
     if(argc > 3)
        cout << masterNL << " total" << endl;
   }
   z = lseek(fileDescriptor, 0, SEEK_SET);
-
+  int storageDescriptor;
+  int charCounter = 0;
    if(wCMD == true){
+
+
+     if(argc < 3){
+       storageDescriptor = open("./temp", O_RDWR|O_CREAT, S_IRWXU);
+       if(storageDescriptor == -1)
+	 perror("open/create error");
+       //write from stdin to temp fle
+       while (( z = read(STDIN_FILENO,buf,1)) > 0){
+	 if(write(storageDescriptor,buf,z) !=z)
+	   perror("write error");
+	 if(z<0)
+	   perror("read error");
+       }
+       close(storageDescriptor);
+       storageDescriptor = open("./temp", O_RDONLY);
+       if(storageDescriptor == -1)
+	 perror("open error");
+
+       while (( z = read(storageDescriptor,buf,1)) > 0){
+	 if(!isspace(buf[0]))
+	   charCounter++;
+	 if(charCounter > 0 && (isspace(buf[0]))){
+	   words++;
+	   charCounter = 0;
+         }
+       }
+       cout << words << endl;
+       if(remove("./temp") != 0)
+	 perror("failure to delete file");
+     }
+     
+     else{
+     for(int i = 2; i < argc; i++){
+       
+       if((! strcmp(argv[i], "-"))) {
+	 //create temp file
+	 storageDescriptor = open("./temp", O_RDWR|O_CREAT, S_IRWXU);
+         if(storageDescriptor == -1)
+	   perror("open/create error");
+	 //write from stdin to temp 
+	 while (( z = read(STDIN_FILENO, buf, 1 )) > 0){
+	     if(write(storageDescriptor, buf, z) != z)
+	       perror("write error");
+	     if(z<0)
+	       perror("read error");
+	   }
+	   
+	 close(storageDescriptor);
+	 storageDescriptor = open("./temp", O_RDONLY);
+	 if(storageDescriptor == -1)
+	   perror("open error");
+	 
+	 while ((z = read(storageDescriptor,buf,1)) > 0){
+	   if(!isspace(buf[0]))
+	     charCounter++;
+	   if(charCounter > 0 && (isspace(buf[0]))){
+	     words++;
+	     charCounter = 0;
+	   }
+	 }
+	 cout << words << " " << "-" << endl;
+	 masterWords += words;
+	 words = 0;
+	 if(remove("./temp") != 0)
+	   perror("failure to delete file");
+	 
+       }
+
+       else{
+
      for(int i = 2; i < argc; i++){  
+
        if((fileDescriptor = open(argv[i], O_RDONLY)) < 2)
 	 perror("open error");
-       
-       int charCounter = 0;
+            
        while((z = read(fileDescriptor, buf, 1)) > 0){
 	 if(!isspace(buf[0])){
 	   charCounter++;
+
+	 }	
+
 	 }
+
 	 if(charCounter > 0 && (isspace(buf[0])     ) ){
 	   words++;
 	   charCounter = 0;
 	 }
        }
-       
        cout << words << " " << argv[i] << endl;
        masterWords += words;
        words = 0;
+       }
      }
+     }
+
      if (argc > 3)
        cout << masterWords << " total" << endl;
   }
+
+
 
  
   
