@@ -1,19 +1,17 @@
-//
-//  main.cpp
-//  P2
-//
-//  Created by this.p1.cpu(); on 10/30/17.
-//  Copyright © 2017 this.p1.cpu();. All rights reserved.
-//
-
 /*
- This program replicates the tail unix head utility
- which copies its input to std output for a certain
- length from the end. The optional parameter [-n] indicates
- the number of liens to be printed while
- [file...] indicates one or more files to
- be printed.
-*/
+ * tail.cpp 
+ *	
+ * This program replicates the tail unix head utility
+ * which copies its input to std output for a certain
+ * length from the end. The optional parameter [-n] indicates
+ * the number of liens to be printed while
+ * [file...] indicates one or more files to
+ * be printed.
+ * 
+ * Owner: Steven Thompson - Gray Dunagan
+ * 
+ * Version: 11.6.17
+ */
 #include <iostream>
 #include <fcntl.h>
 #include <unistd.h>
@@ -27,19 +25,23 @@
 #include <cstdio>
 #include <cerrno>
 
-
 using std::cout;
 using std::endl;
 using namespace std;
 
-//print n number of lines from end of STDIN
-//@param n num lines to be read
+/*
+ * This function prints from the standard input and print the "n" lines from
+ * the end of the file
+ *
+ * @param n the integer amount of lines that will be printed from the bottom
+ */
 void printFromSTDIN(int n){
   int linesFromSTDIN = 0;
   char buf[1];
   int z;
   int storageDescriptor;
-
+  
+  // create temp file to store and read later	
   storageDescriptor = open("./temp", O_RDWR|O_CREAT, S_IRWXU);
   if(storageDescriptor ==-1)
     perror("open/create error in printFromSTDIN");
@@ -95,8 +97,13 @@ void printFromSTDIN(int n){
 
 }
 
-//prints n number of lines form end of file
-//@param n num lines to be printed
+/*
+ * This function prints from the "fileName" file and print the "n" lines from
+ * the end of the file
+ *
+ * @param n the integer amount of lines that will be printed from the bottom
+ * @param fileName the file in which to use for this function.
+ */
 void printFromFileN(int n, char* fileName){
   int linesRead = 0;
   char buf[1];
@@ -140,6 +147,12 @@ void printFromFileN(int n, char* fileName){
   }
 }
 
+/*
+ * This is the main function
+ *
+ * @param argc the amount of arguments from the command line
+ * @param argv[] the file in which to interpret as a argument
+ */
 int main(int argc, char* argv[]) {
 
   //default numLines is 10
