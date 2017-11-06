@@ -34,14 +34,11 @@ using namespace std;
 int main(int argc, char* argv[]) {
   char buf[1];
   int z;
-  int count = 0;
-  int nl = 0;
-  int words = 0;
+  int count = 0, masterCount = 0;
+  int nl = 0,masterNL = 0;
+  int words = 0, masterWords = 0;
   int fileDescriptor;
 
-  if((fileDescriptor = open(argv[2], O_RDONLY)) < 2)
-    perror("open error");
-    
     
   bool cCMD = false;
   bool lCMD = false;
@@ -59,36 +56,78 @@ int main(int argc, char* argv[]) {
       wCMD = true;
   }
 
-  if(cCMD == true)
-    while((z = read(fileDescriptor, buf, 1)) > 0)
-      count++;
+   if(cCMD == true){
+
+     for(int i = 2; i < argc; i++){
+       if((fileDescriptor = open(argv[i],O_RDONLY))< 2)
+	 perror("open error");
+
+       while((z = read(fileDescriptor, buf, 1)) > 0){
+	 if(z == -1)
+	   perror("read error");
+	 count++;
+       }
+       cout << count << " " << argv[i] << endl;
+       masterCount += count;
+       count = 0;
+     }
+     if(argc > 3)
+       cout << masterCount << " total" << endl;
+   }
 
 
   z = lseek(fileDescriptor, 0, SEEK_SET);
 
-  if(lCMD == true)
-    while((z = read(fileDescriptor, buf, 1)) > 0)
-      if(buf[0] == '\n')
-        nl++;
+  if(lCMD == true){
 
+    for(int i = 2; i < argc; i++){
+      
+      if((fileDescriptor = open(argv[i], O_RDONLY)) < 2)
+	perror("open error");
+
+      while((z = read(fileDescriptor, buf, 1)) > 0){
+	if(z==-1)
+	  perror("read error");
+	if(buf[0] == '\n')
+	  nl++;
+      }
+      cout << nl << " " << argv[i] << endl;
+      masterNL += nl;
+      nl = 0;
+    }
+    if(argc > 3)
+       cout << masterNL << " total" << endl;
+  }
   z = lseek(fileDescriptor, 0, SEEK_SET);
 
    if(wCMD == true){
-    int charCounter = 0;
-    while((z = read(fileDescriptor, buf, 1)) > 0){
-      if(!isspace(buf[0])){
-          charCounter++;
-          cout << "Character number: " << charCounter << " ---> " <<  buf[0] <<  endl;
-      }
-      if(charCounter > 1 && isspace(buf[0])){
-        words++;
-        charCounter = 0;
-      }
-    }
+
+     for(int i = 2; i < argc; i++){
+       
+       if((fileDescriptor = open(argv[i], O_RDONLY)) < 2)
+	 perror("open error");
+       
+       int charCounter = 0;
+       while((z = read(fileDescriptor, buf, 1)) > 0){
+	 if(!isspace(buf[0])){
+	   charCounter++;
+//          cout << "Character number: " << charCounter << " ---> " <<  buf[0] <<  endl;
+	 }
+	 if(charCounter > 1 && isspace(buf[0])){
+	   words++;
+	   charCounter = 0;
+	 }
+       }
+
+       cout << words << " " << argv[i] << endl;
+       masterWords += words;
+       words = 0;
+     }
+     if (argc > 3)
+       cout << masterWords << " total" << endl;
   }
 
-  cout << "Bytes: " << count << "\tNewLines: " << nl << "\tWord Count: " << words << endl;
-  
+ 
   
 return 0;
 }
