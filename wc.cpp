@@ -1,19 +1,18 @@
-//
-//  wc.cpp
-//  P2
-//
-//  Created by this.p1.cpu(); on 10/30/17.
-//  Copyright © 2017 this.p1.cpu();. All rights reserved.
-//
-
 /*
- This program replicates the tail unix head utility
- which copies its input to std output for a certain
- length from the end. The optional parameter [-n] indicates
- the number of liens to be printed while
- [file...] indicates one or more files to
- be printed.
-*/
+ * wc.cpp 
+ *	
+ * This program replicates the wc unix word count utility
+ * which copies its input to std output for a certain
+ * length from the end. The optional parameter [-c] indicates
+ * the number of characters to be printed while
+ * [-l] indicates the count of lines in a file, and [-w] 
+ * indicates the amount of words in a file. Otherwise,
+ * standard input in executed and printed.
+ * 
+ * Owner: Steven Thompson - Gray Dunagan
+ * 
+ * Version: 11.6.17
+ */
 #include <iostream>
 #include <fcntl.h>
 #include <unistd.h>
@@ -31,6 +30,16 @@ using std::cout;
 using std::endl;
 using namespace std;
 
+/*
+ * Main function -- 
+ *
+ * This function wil determine which argument to execute
+ * and allow the program to determine the outcome
+ * based off of that argument.
+ *
+ * @param argc the amount of arguments from the command line
+ * @param argv[] the file in which to interpret as a argument
+ */
 int main(int argc, char* argv[]) {
   char buf[1];
   int z;
