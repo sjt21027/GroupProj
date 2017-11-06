@@ -27,38 +27,62 @@
 #include <cstdio>
 #include <cerrno>
 
+
 using std::cout;
 using std::endl;
 using namespace std;
 
-//print n number of lines from STDIN
+//print n number of lines from end of STDIN
 //@param n num lines to be read
 void printFromSTDIN(int n){
-  int linesRead = 0;
+  int linesFromSTDIN = 0;
   char buf[1];
   int z;
+
+  int storageDescriptor;
+
+  storageDescriptor = open("./temp", O_RDWR|O_CREAT, S_IRWXU);
+  if(storageDescriptor ==-1)
+    perror("open/create error in printFromSTDIN");
+
   //read 1 char at a time from STDIN
   while ((z = read(STDIN_FILENO, buf, 1)) > 0){
 
     //compare buff to newline "\n"
     //if newline, increment linesRead
     if ( buf[0]  == '\n' )
-      linesRead++;
-    
-    if(write(STDOUT_FILENO, buf, z) != z)
+      linesFromSTDIN++;    
+    if(write(storageDescriptor, buf, z) != z)
       perror("write error in printFromSTDIN");
-
     if (z < 0)
       perror("read error in printFromSTDIN");
-
-    if(linesRead == (n))
-      return;
   }
+
+  lseek(storageDescriptor, 0, SEEK_SET);
+
+  while((z = read(storageDescriptor, buf, 1)) > 0){
+    if(write(STDOUT_FILENO, buf, z) != z)
+      perror("write error in printFromSTDIN");
+  }
+
+
+
+
+
+
+
+
+  if( remove("./temp") != 0)
+    perror("failure to delete file");
+
 }
 
+//prints n number of lines form end of file
+//@param n num lines to be printed
 void printFromFileN(int n, char* fileName){
   int linesRead = 0;
   char buf[1];
+  int y = 0;
   int z;
   int count = 0;
   int fileDescriptor;
@@ -69,19 +93,30 @@ void printFromFileN(int n, char* fileName){
     if (buf[0] == '\n')
       linesRead++;
   }
-  if((n > linesRead) | (n < 0))
-    perror("N is greater that the lines read, or less than zero");
 
-  z = lseek(fileDescriptor, 0, SEEK_SET);
-  while ((z = read(fileDescriptor, buf, 1)) > 0){
-    if (buf[0] == '\n')
-      count++;
+  lseek(fileDescriptor, 0, SEEK_SET);
 
-    if(count == (linesRead-n)){
-     z = lseek(fileDescriptor, -1, SEEK_CUR);
-     while((z = read(fileDescriptor, buf, 1)) > 0){
-        if(write(STDIN_FILENO,buf,z) !=z)
-          perror("write error in printFileFromN");
+  if (linesRead <= n){
+    while ((y = read(fileDescriptor, buf, 1)) > 0 ){
+      if(write(STDOUT_FILENO, buf, y) != y)
+	perror("write error in printFromFileN");
+       if(y<0)
+         perror("read error in PrintFromFileN");
+    }
+  }
+
+  else{
+    z = lseek(fileDescriptor, 0, SEEK_SET);
+    while ((z = read(fileDescriptor, buf, 1)) > 0){
+      if (buf[0] == '\n')
+	count++;
+
+      if(count == (linesRead-n)){
+	z = lseek(fileDescriptor, -1, SEEK_CUR);
+	while((z = read(fileDescriptor, buf, 1)) > 0){
+	  if(write(STDIN_FILENO,buf,z) !=z)
+	    perror("write error in printFileFromN");
+	}
       }
     }
   }
