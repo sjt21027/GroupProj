@@ -1,6 +1,6 @@
 CSCI 1730 Project 2 Fall 2017
 Steven Thompson      811168792
-       -implemented tail.cpp wc.cpp and doc comments
+       -implemented tail.cpp, wc.cpp, and doc comments
 
 Donald Dunagan	811648053
        -implemented env.cpp,false.cpp,head.cpp,true.cpp
