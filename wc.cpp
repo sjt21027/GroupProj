@@ -86,6 +86,7 @@ int main(int argc, char* argv[]) {
 	   }
 	   cout << count << " " << "-" << endl;
 	   masterCount += count;
+	   count = 0;
        }
 
        else{
@@ -119,7 +120,7 @@ int main(int argc, char* argv[]) {
 	if(buf[0] == '\n')
 	  nl++;
       }
-      cout << nl << " " << "-" << endl;
+      cout << nl << " " << endl;
     }
 
     else{
@@ -134,10 +135,11 @@ int main(int argc, char* argv[]) {
 	}
 	cout << nl << " "  << endl;
 	masterNL += nl;
+	nl = 0;
       }
       
       else{
-    for(int i = 2; i < argc; i++){
+
 
       if((fileDescriptor = open(argv[i], O_RDONLY)) < 2)
 	perror("open error");
@@ -163,7 +165,6 @@ int main(int argc, char* argv[]) {
   int storageDescriptor;
   int charCounter = 0;
    if(wCMD == true){
-
 
      if(argc < 3){
        storageDescriptor = open("./temp", O_RDWR|O_CREAT, S_IRWXU);
@@ -223,44 +224,39 @@ int main(int argc, char* argv[]) {
 	     charCounter = 0;
 	   }
 	 }
-	 cout << words << " " << "-" << endl;
+	 cout << words << " " << "-" <<  endl;
 	 masterWords += words;
 	 words = 0;
 	 if(remove("./temp") != 0)
 	   perror("failure to delete file");
-	 
        }
 
-       else{
+      else{
 
-     for(int i = 2; i < argc; i++){  
-
-       if((fileDescriptor = open(argv[i], O_RDONLY)) < 2)
-	 perror("open error");
+	  if((fileDescriptor = open(argv[i], O_RDONLY)) < 2)
+	    perror("open error");
             
-       while((z = read(fileDescriptor, buf, 1)) > 0){
-	 if(!isspace(buf[0])){
-	   charCounter++;
+	  while((z = read(fileDescriptor, buf, 1)) > 0){
+	    if(!isspace(buf[0]))
+	      charCounter++;
+	  }
 
-	 }	
+	  if(charCounter > 0 && (isspace(buf[0]))){
+	    words++;
+	    charCounter = 0;
+	  }
+      }
 
-	 }
-
-	 if(charCounter > 0 && (isspace(buf[0])     ) ){
-	   words++;
-	   charCounter = 0;
-	 }
-       }
-       cout << words << " " << argv[i] << endl;
-       masterWords += words;
-       words = 0;
-       }
+	cout << words << " " << argv[i] << endl;
+	masterWords += words;
+	words = 0;
+     
      }
      }
 
      if (argc > 3)
        cout << masterWords << " total" << endl;
-  }
+   }
 
 
 
