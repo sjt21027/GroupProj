@@ -38,7 +38,6 @@ void printFromSTDIN(int n){
   int linesFromSTDIN = 0;
   char buf[1];
   int z;
-
   int storageDescriptor;
 
   storageDescriptor = open("./temp", O_RDWR|O_CREAT, S_IRWXU);
@@ -58,20 +57,39 @@ void printFromSTDIN(int n){
       perror("read error in printFromSTDIN");
   }
 
-  lseek(storageDescriptor, 0, SEEK_SET);
+  close (storageDescriptor);
 
-  while((z = read(storageDescriptor, buf, 1)) > 0){
-    if(write(STDOUT_FILENO, buf, z) != z)
-      perror("write error in printFromSTDIN");
+  if(linesFromSTDIN <=n){
+    storageDescriptor = open("./temp", O_RDONLY);
+    if(storageDescriptor == -1)
+      perror("open error");
+    while ((z = read(storageDescriptor, buf, 1)) > 0){
+      if(write(STDOUT_FILENO, buf, z) != z)
+	 perror("write error in printFromStdin");
+      if(z<0)
+	 perror("read error in printFromSTDIN");
+    }
   }
 
+  int linesRead = 0;
 
-
-
-
-
-
-
+  if(linesFromSTDIN > n){
+    storageDescriptor = open("./temp", O_RDONLY);
+    if(storageDescriptor == -1)
+      perror("open error");
+    while ((z = read(storageDescriptor,buf,1)) >0){
+      if(linesRead >= (linesFromSTDIN-n)){
+	
+	if(write(STDOUT_FILENO,buf,z)!=z)
+	  perror("write error");
+      } 
+      if(buf[0] == '\n')
+	linesRead++;
+      if(z<0)
+	perror("read error");
+    }
+  }
+     
   if( remove("./temp") != 0)
     perror("failure to delete file");
 
@@ -112,9 +130,9 @@ void printFromFileN(int n, char* fileName){
 	count++;
 
       if(count == (linesRead-n)){
-	z = lseek(fileDescriptor, -1, SEEK_CUR);
+	z = lseek(fileDescriptor, 0, SEEK_CUR);
 	while((z = read(fileDescriptor, buf, 1)) > 0){
-	  if(write(STDIN_FILENO,buf,z) !=z)
+	  if(write(STDOUT_FILENO,buf,z) !=z)
 	    perror("write error in printFileFromN");
 	}
       }
@@ -134,7 +152,6 @@ int main(int argc, char* argv[]) {
     if (! strcmp(argv[i], "-n")){
       numLineParam = true;
       n = atoi (argv[i + 1]);
-      cout << "N value: " << n << endl;
       if (n < 0){
         cout<< "n must be non-negative";
         exit(EXIT_FAILURE);
